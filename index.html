@@ -4,30 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interpolation Terminology Alert</title>
-
+    
     <!-- React and ReactDOM -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
     <!-- Recharts for visualization -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.10.3/Recharts.min.js"></script>
-
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
         }
-        .container {
-            max-width: 100%;
-            padding: 20px;
-        }
+        
         canvas {
             max-width: 100%;
             height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .select-custom {
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+        
+        .select-custom:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        
+        .gradient-heading {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        .footer {
+            background: linear-gradient(90deg, #1e40af, #4338ca);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+        }
+
+        /* Custom tooltip styles */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 250px;
+            line-height: 1.4;
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.25rem;
         }
     </style>
 </head>
@@ -40,13 +150,14 @@
         const InterpolationExplorer = () => {
           // State for managing data points and visualization
           const [points, setPoints] = useState([
-            { x: 100, y: 300 },
+            { x: 150, y: 300 },
             { x: 300, y: 100 },
-            { x: 500, y: 350 },
+            { x: 450, y: 250 },
           ]);
           const [method, setMethod] = useState('linear');
           const [isAdding, setIsAdding] = useState(false);
           const [showExplanation, setShowExplanation] = useState(true);
+          const [showHelp, setShowHelp] = useState(true);
           const canvasRef = useRef(null);
           const [hoverX, setHoverX] = useState(null);
           const [hoverValue, setHoverValue] = useState(null);
@@ -55,6 +166,7 @@
           const [userPrediction, setUserPrediction] = useState('');
           const [feedbackMessage, setFeedbackMessage] = useState('');
           const [showAnswer, setShowAnswer] = useState(false);
+          const [theme, setTheme] = useState('blue');
 
           // Sort points by x-coordinate
           const sortedPoints = [...points].sort((a, b) => a.x - b.x);
@@ -63,6 +175,49 @@
           const width = 600;
           const height = 400;
           const padding = 40;
+
+          // Theme colors
+          const getThemeColors = () => {
+            const themes = {
+              blue: {
+                primary: '#3b82f6',
+                secondary: '#93c5fd',
+                accent: '#1e40af',
+                success: '#10b981',
+                danger: '#ef4444',
+                warning: '#f59e0b',
+                info: '#6366f1',
+                background: '#f8fafc',
+                text: '#334155'
+              },
+              purple: {
+                primary: '#8b5cf6',
+                secondary: '#c4b5fd',
+                accent: '#6d28d9',
+                success: '#10b981',
+                danger: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6',
+                background: '#faf5ff',
+                text: '#3f3f46'
+              },
+              teal: {
+                primary: '#14b8a6',
+                secondary: '#99f6e4',
+                accent: '#0f766e',
+                success: '#22c55e',
+                danger: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6',
+                background: '#f0fdfa',
+                text: '#334155'
+              }
+            };
+
+            return themes[theme] || themes.blue;
+          };
+
+          const colors = getThemeColors();
 
           // Linear interpolation function
           const linearInterpolate = (x, points) => {
@@ -73,7 +228,7 @@
                 const y1 = points[i].y;
                 const x2 = points[i+1].x;
                 const y2 = points[i+1].y;
-
+                
                 // Linear interpolation formula: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
                 return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
               }
@@ -84,11 +239,11 @@
           // Nearest neighbor interpolation
           const nearestNeighbor = (x, points) => {
             if (points.length === 0) return null;
-
+            
             // Find the closest point
             let closest = points[0];
             let minDistance = Math.abs(x - closest.x);
-
+            
             for (let i = 1; i < points.length; i++) {
               const distance = Math.abs(x - points[i].x);
               if (distance < minDistance) {
@@ -96,14 +251,14 @@
                 closest = points[i];
               }
             }
-
+            
             return closest.y;
           };
 
           // Polynomial interpolation using Lagrange method
           const polynomialInterpolate = (x, points) => {
             if (points.length <= 1) return points.length === 1 ? points[0].y : null;
-
+            
             let result = 0;
             for (let i = 0; i < points.length; i++) {
               let term = points[i].y;
@@ -120,12 +275,12 @@
           // Get interpolated value based on selected method
           const getInterpolatedValue = (x) => {
             if (sortedPoints.length < 2) return null;
-
+            
             // Only interpolate between the first and last points
             if (x < sortedPoints[0].x || x > sortedPoints[sortedPoints.length - 1].x) {
               return null;
             }
-
+            
             switch (method) {
               case 'linear':
                 return linearInterpolate(x, sortedPoints);
@@ -142,138 +297,265 @@
           useEffect(() => {
             const canvas = canvasRef.current;
             if (!canvas) return;
-
+            
             const ctx = canvas.getContext('2d');
-
+            
             // Clear canvas
             ctx.clearRect(0, 0, width, height);
-
+            
+            // Draw background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            
             // Draw grid
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 0.5;
-
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            
             // Draw vertical grid lines
             for (let x = padding; x <= width - padding; x += 50) {
               ctx.beginPath();
               ctx.moveTo(x, padding);
               ctx.lineTo(x, height - padding);
               ctx.stroke();
-
+              
               // Draw x-axis labels
-              ctx.fillStyle = '#666';
-              ctx.font = '12px Arial';
+              ctx.fillStyle = '#64748b';
+              ctx.font = '12px Poppins';
               ctx.textAlign = 'center';
-              ctx.fillText(x.toString(), x, height - padding/2);
+              ctx.fillText(x.toString(), x, height - padding/2 + 15);
             }
-
+            
             // Draw horizontal grid lines
             for (let y = padding; y <= height - padding; y += 50) {
               ctx.beginPath();
               ctx.moveTo(padding, y);
               ctx.lineTo(width - padding, y);
               ctx.stroke();
-
+              
               // Draw y-axis labels
-              ctx.fillStyle = '#666';
-              ctx.font = '12px Arial';
+              ctx.fillStyle = '#64748b';
+              ctx.font = '12px Poppins';
               ctx.textAlign = 'right';
               ctx.fillText((height - y).toString(), padding - 10, y + 4);
             }
-
+            
             // Draw x and y axes
-            ctx.strokeStyle = '#000';
+            ctx.strokeStyle = '#475569';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, height - padding);
             ctx.lineTo(width - padding, height - padding);
             ctx.stroke();
-
+            
             ctx.beginPath();
             ctx.moveTo(padding, height - padding);
             ctx.lineTo(padding, padding);
             ctx.stroke();
-
+            
+            // Add axes labels
+            ctx.fillStyle = '#334155';
+            ctx.font = '14px Poppins';
+            ctx.textAlign = 'center';
+            ctx.fillText('X', width - padding + 20, height - padding + 5);
+            ctx.fillText('Y', padding - 5, padding - 15);
+            
             // Draw data points
-            ctx.fillStyle = '#3498db';
+            const pointRadius = 8;
             points.forEach(point => {
+              // Draw point shadow
               ctx.beginPath();
-              ctx.arc(point.x, point.y, 8, 0, Math.PI * 2);
+              ctx.arc(point.x, point.y, pointRadius + 2, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
               ctx.fill();
+              
+              // Draw point
+              ctx.beginPath();
+              ctx.arc(point.x, point.y, pointRadius, 0, Math.PI * 2);
+              ctx.fillStyle = colors.primary;
+              ctx.fill();
+              
+              // Draw point border
+              ctx.beginPath();
+              ctx.arc(point.x, point.y, pointRadius, 0, Math.PI * 2);
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 2;
+              ctx.stroke();
             });
 
             // Highlight prediction point if in predicting mode
             if (isPredicting) {
-              ctx.fillStyle = '#e74c3c';
+              // Draw shadow
               ctx.beginPath();
-              ctx.arc(targetX, height - padding, 8, 0, Math.PI * 2);
+              ctx.arc(targetX, height - padding, pointRadius + 2, 0, Math.PI * 2);
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
               ctx.fill();
-              ctx.fillStyle = '#000';
-              ctx.font = '14px Arial';
+              
+              // Draw point
+              ctx.beginPath();
+              ctx.arc(targetX, height - padding, pointRadius, 0, Math.PI * 2);
+              ctx.fillStyle = colors.warning;
+              ctx.fill();
+              
+              // Draw border
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(targetX, height - padding, pointRadius, 0, Math.PI * 2);
+              ctx.stroke();
+              
+              // Draw label
+              ctx.fillStyle = colors.text;
+              ctx.font = 'bold 14px Poppins';
               ctx.textAlign = 'center';
-              ctx.fillText(`Find y when x = ${targetX}`, targetX, height - padding + 20);
+              ctx.fillText(`Find y when x = ${targetX}`, targetX, height - padding + 30);
             }
-
+            
             // Draw interpolation curve
             if (sortedPoints.length >= 2) {
+              // Draw curve shadow
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+              ctx.shadowBlur = 5;
+              ctx.shadowOffsetX = 2;
+              ctx.shadowOffsetY = 2;
+              
               ctx.strokeStyle = getMethodColor();
               ctx.lineWidth = 3;
               ctx.beginPath();
-
+              
               const startX = sortedPoints[0].x;
               const endX = sortedPoints[sortedPoints.length - 1].x;
-
-              ctx.moveTo(startX, linearInterpolate(startX, sortedPoints));
-
+              
+              let firstY = null;
+              
               for (let x = startX; x <= endX; x += 2) {
                 const y = getInterpolatedValue(x);
                 if (y !== null) {
-                  ctx.lineTo(x, y);
+                  if (firstY === null) {
+                    firstY = y;
+                    ctx.moveTo(x, y);
+                  } else {
+                    ctx.lineTo(x, y);
+                  }
                 }
               }
-
+              
               ctx.stroke();
+              
+              // Reset shadow
+              ctx.shadowColor = 'transparent';
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
             }
-
+            
             // Draw hover indicator
             if (hoverX !== null && hoverValue !== null) {
               const circleRadius = 6;
-              ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+              
+              // Draw a vertical line from x-axis to the point
+              ctx.beginPath();
+              ctx.moveTo(hoverX, height - padding);
+              ctx.lineTo(hoverX, hoverValue);
+              ctx.strokeStyle = 'rgba(100, 116, 139, 0.5)';
+              ctx.lineWidth = 1;
+              ctx.setLineDash([5, 3]);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              
+              // Draw a horizontal line from y-axis to the point
+              ctx.beginPath();
+              ctx.moveTo(padding, hoverValue);
+              ctx.lineTo(hoverX, hoverValue);
+              ctx.stroke();
+              
+              // Draw hover point
+              ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
               ctx.beginPath();
               ctx.arc(hoverX, hoverValue, circleRadius, 0, Math.PI * 2);
               ctx.fill();
-
-              ctx.fillStyle = '#000';
-              ctx.font = '14px Arial';
+              
+              // Draw hover point border
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(hoverX, hoverValue, circleRadius, 0, Math.PI * 2);
+              ctx.stroke();
+              
+              // Draw hover coordinates
+              const coordText = `(${hoverX}, ${Math.round(height - hoverValue)})`;
+              const textWidth = ctx.measureText(coordText).width;
+              
+              // Draw background for text
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+              ctx.roundRect(hoverX - textWidth/2 - 5, hoverValue - 35, textWidth + 10, 25, 5);
+              ctx.fill();
+              
+              // Draw text
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 14px Poppins';
               ctx.textAlign = 'center';
-              ctx.fillText(`(${hoverX}, ${Math.round(height - hoverValue)})`, hoverX, hoverValue - 15);
+              ctx.fillText(coordText, hoverX, hoverValue - 18);
             }
-
+            
             // Show the actual answer in prediction mode if requested
             if (isPredicting && showAnswer) {
               const actualY = getInterpolatedValue(targetX);
               if (actualY !== null) {
-                ctx.fillStyle = '#27ae60';
+                // Draw shadow
                 ctx.beginPath();
-                ctx.arc(targetX, actualY, 8, 0, Math.PI * 2);
+                ctx.arc(targetX, actualY, pointRadius + 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.fill();
-
-                ctx.fillStyle = '#000';
-                ctx.font = '14px Arial';
+                
+                // Draw point
+                ctx.beginPath();
+                ctx.arc(targetX, actualY, pointRadius, 0, Math.PI * 2);
+                ctx.fillStyle = colors.success;
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(targetX, actualY, pointRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Draw dotted line between prediction point and actual point
+                ctx.beginPath();
+                ctx.moveTo(targetX, height - padding);
+                ctx.lineTo(targetX, actualY);
+                ctx.strokeStyle = 'rgba(16, 185, 129, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw text background
+                const actualYText = `Actual y = ${Math.round(height - actualY)}`;
+                const textWidth = ctx.measureText(actualYText).width;
+                
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.8)';
+                ctx.roundRect(targetX - textWidth/2 - 5, actualY - 35, textWidth + 10, 25, 5);
+                ctx.fill();
+                
+                // Draw text
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px Poppins';
                 ctx.textAlign = 'center';
-                ctx.fillText(`Actual y = ${Math.round(height - actualY)}`, targetX, actualY - 15);
+                ctx.fillText(actualYText, targetX, actualY - 18);
               }
             }
-          }, [points, method, hoverX, hoverValue, isPredicting, targetX, showAnswer]);
+          }, [points, method, hoverX, hoverValue, isPredicting, targetX, showAnswer, theme]);
 
           // Handle canvas click to add points
           const handleCanvasClick = (e) => {
             if (!isAdding) return;
-
+            
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-
+            
             // Only add points within the plotting area
             if (x >= padding && x <= width - padding && y >= padding && y <= height - padding) {
               setPoints([...points, { x, y }]);
@@ -287,14 +569,14 @@
               setHoverValue(null);
               return;
             }
-
+            
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
-
+            
             const startX = sortedPoints[0].x;
             const endX = sortedPoints[sortedPoints.length - 1].x;
-
+            
             if (x >= startX && x <= endX) {
               const interpolatedY = getInterpolatedValue(x);
               if (interpolatedY !== null) {
@@ -303,14 +585,18 @@
                 return;
               }
             }
-
+            
             setHoverX(null);
             setHoverValue(null);
           };
 
           // Reset the canvas
           const resetCanvas = () => {
-            setPoints([]);
+            setPoints([
+              { x: 150, y: 300 },
+              { x: 300, y: 100 },
+              { x: 450, y: 250 },
+            ]);
             setIsAdding(false);
             setIsPredicting(false);
             setShowAnswer(false);
@@ -321,11 +607,31 @@
           // Get color for current interpolation method
           const getMethodColor = () => {
             switch (method) {
-              case 'linear': return '#3498db';
-              case 'nearest': return '#e74c3c';
-              case 'polynomial': return '#27ae60';
-              default: return '#3498db';
+              case 'linear': return colors.primary;
+              case 'nearest': return colors.danger;
+              case 'polynomial': return colors.success;
+              default: return colors.primary;
             }
+          };
+
+          // Get badge color for keywords
+          const getBadgeColor = (keyword) => {
+            const keywords = {
+              'slope': colors.primary,
+              'line segment': colors.primary,
+              'linear function': colors.primary,
+              'proportional': colors.primary,
+              'proximity': colors.danger,
+              'step function': colors.danger,
+              'discontinuous': colors.danger,
+              'piecewise constant': colors.danger,
+              'curve fitting': colors.success,
+              'Lagrange polynomial': colors.success,
+              'smooth function': colors.success,
+              'continuous derivative': colors.success
+            };
+            
+            return keywords[keyword] || '#6b7280';
           };
 
           // Get comprehensive explanation for the method
@@ -333,32 +639,65 @@
             switch (method) {
               case 'linear':
                 return (
-                  <div>
-                    <p className="font-bold">Linear Interpolation:</p>
-                    <p>• Simple: It's like connecting dots with a ruler!</p>
-                    <p>• Concept: Values change at a constant rate between known points, creating straight line segments.</p>
-                    <p>• Formula: y = y₁ + (x - x₁) × (y₂ - y₁) ÷ (x₂ - x₁)</p>
-                    <p>• Key Terms: slope, line segment, linear function, proportional change</p>
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-bold" style={{color: colors.primary}}>Linear Interpolation</h3>
+                    <p className="mb-2">Connects points with straight lines, assuming values change at a constant rate between known points.</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {['slope', 'line segment', 'linear function', 'proportional'].map(term => (
+                        <span 
+                          key={term} 
+                          className="badge" 
+                          style={{backgroundColor: getBadgeColor(term), color: 'white'}}
+                        >
+                          {term}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-sm font-mono">y = y₁ + (x - x₁) × (y₂ - y₁) ÷ (x₂ - x₁)</p>
+                    </div>
                   </div>
                 );
               case 'nearest':
                 return (
-                  <div>
-                    <p className="font-bold">Nearest Neighbor Interpolation:</p>
-                    <p>• Simple: It finds the closest known point and uses that value.</p>
-                    <p>• Concept: Creates a step-like graph where values change suddenly at the halfway point between known values.</p>
-                    <p>• Formula: f(x) = y₁ where point (x₁,y₁) has the smallest distance |x-x₁|</p>
-                    <p>• Key Terms: proximity, step function, discontinuous, piecewise constant</p>
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-bold" style={{color: colors.danger}}>Nearest Neighbor Interpolation</h3>
+                    <p className="mb-2">Uses the value of the closest known point, creating a step-like graph with sudden value changes.</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {['proximity', 'step function', 'discontinuous', 'piecewise constant'].map(term => (
+                        <span 
+                          key={term} 
+                          className="badge" 
+                          style={{backgroundColor: getBadgeColor(term), color: 'white'}}
+                        >
+                          {term}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-sm font-mono">f(x) = y₁ where (x₁,y₁) has smallest |x-x₁|</p>
+                    </div>
                   </div>
                 );
               case 'polynomial':
                 return (
-                  <div>
-                    <p className="font-bold">Polynomial Interpolation:</p>
-                    <p>• Simple: It draws a smooth curve that passes through every point exactly.</p>
-                    <p>• Concept: Creates a single smooth curve with continuously changing slope throughout.</p>
-                    <p>• Technical: Uses Lagrange polynomials to create a function that passes through all points.</p>
-                    <p>• Key Terms: curve fitting, Lagrange polynomial, smooth function, continuous derivative</p>
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-bold" style={{color: colors.success}}>Polynomial Interpolation</h3>
+                    <p className="mb-2">Creates a smooth curve passing through all points with a continuously changing slope throughout.</p>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {['curve fitting', 'Lagrange polynomial', 'smooth function', 'continuous derivative'].map(term => (
+                        <span 
+                          key={term} 
+                          className="badge" 
+                          style={{backgroundColor: getBadgeColor(term), color: 'white'}}
+                        >
+                          {term}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-sm font-mono">Complex formula using Lagrange polynomials</p>
+                    </div>
                   </div>
                 );
             }
@@ -370,16 +709,16 @@
               setFeedbackMessage("Please enter your prediction!");
               return;
             }
-
+            
             const prediction = parseFloat(userPrediction);
             if (isNaN(prediction)) {
               setFeedbackMessage("Please enter a valid number!");
               return;
             }
-
+            
             const actualY = Math.round(height - getInterpolatedValue(targetX));
             const difference = Math.abs(prediction - actualY);
-
+            
             if (difference <= 5) {
               setFeedbackMessage("Great job! Your prediction is very close!");
             } else if (difference <= 15) {
@@ -387,7 +726,7 @@
             } else {
               setFeedbackMessage("Try again! Hint: Look at the pattern of the points.");
             }
-
+            
             setShowAnswer(true);
           };
 
@@ -397,12 +736,12 @@
               alert("You need at least 2 points to make a prediction!");
               return;
             }
-
+            
             // Find a random x-value between the first and last point
             const startX = sortedPoints[0].x;
             const endX = sortedPoints[sortedPoints.length - 1].x;
             const randomX = Math.floor(startX + Math.random() * (endX - startX));
-
+            
             setTargetX(randomX);
             setIsPredicting(true);
             setShowAnswer(false);
@@ -411,167 +750,23 @@
           };
 
           return (
-            <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg shadow">
-              <h1 className="text-2xl font-bold mb-4">Interpolation Terminology Alert</h1>
-
-              {/* Controls */}
-              <div className="flex flex-wrap justify-center gap-4 mb-4">
-                <div className="flex items-center">
-                  <label className="mr-2 font-medium">Method:</label>
-                  <select
-                    value={method}
-                    onChange={(e) => setMethod(e.target.value)}
-                    className="border rounded p-1"
-                  >
-                    <option value="linear">Linear</option>
-                    <option value="nearest">Nearest Neighbor</option>
-                    <option value="polynomial">Polynomial</option>
-                  </select>
-                </div>
-
-                <button
-                  className={`px-3 py-1 rounded ${isAdding ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
-                  onClick={() => setIsAdding(!isAdding)}
-                >
-                  {isAdding ? 'Done Adding' : 'Add Points'}
-                </button>
-
-                <button
-                  className="px-3 py-1 rounded bg-red-500 text-white"
-                  onClick={resetCanvas}
-                >
-                  Reset
-                </button>
-
-                <button
-                  className="px-3 py-1 rounded bg-purple-500 text-white"
-                  onClick={startPrediction}
-                  disabled={isPredicting}
-                >
-                  Practice!
-                </button>
+            <div className="main-container">
+              <div className="text-center mb-8">
+                <h1 className="text-4xl font-bold mb-3 gradient-heading">Interpolation Terminology Alert</h1>
+                <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                  Explore how different interpolation methods work by adding and manipulating data points. 
+                  Learn key terminology while visualizing mathematical concepts in action.
+                </p>
               </div>
-
-              {/* Explanation Box */}
-              {showExplanation && (
-                <div className="mb-4 p-4 bg-yellow-100 rounded">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold">Terminology & Explanation</h3>
-                    <button
-                      className="text-sm text-blue-500 underline"
-                      onClick={() => setShowExplanation(false)}
+              
+              {/* How to Use Box */}
+              {showHelp && (
+                <div className="card p-4 mb-6 border-l-4 bg-blue-50" style={{borderLeftColor: colors.info}}>
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-lg font-bold mb-2" style={{color: colors.info}}>How to Use This Tool</h3>
+                    <button 
+                      className="text-gray-500 hover:text-gray-700" 
+                      onClick={() => setShowHelp(false)}
+                      aria-label="Close"
                     >
-                      Hide Explanation
-                    </button>
-                  </div>
-                  <div className="bg-white p-3 rounded shadow-inner">
-                    {getExplanation()}
-                  </div>
-                </div>
-              )}
-
-              {!showExplanation && (
-                <button
-                  className="mb-4 text-sm text-blue-500 underline"
-                  onClick={() => setShowExplanation(true)}
-                >
-                  Show Terminology
-                </button>
-              )}
-
-              {/* Canvas */}
-              <div className="relative mb-4">
-                <canvas
-                  ref={canvasRef}
-                  width={width}
-                  height={height}
-                  onClick={handleCanvasClick}
-                  onMouseMove={handleCanvasMouseMove}
-                  className="border border-gray-300"
-                />
-
-                {isAdding && (
-                  <div className="absolute top-2 left-2 bg-white p-2 rounded shadow">
-                    Click to add points
-                  </div>
-                )}
-              </div>
-
-              {/* Prediction Challenge */}
-              {isPredicting && (
-                <div className="mt-4 p-4 bg-blue-100 rounded flex flex-col items-center">
-                  <h3 className="text-lg font-bold mb-2">Prediction Challenge!</h3>
-                  <p>Using the {method} interpolation method, what do you think the y-value is at x = {targetX}?</p>
-
-                  <div className="flex items-center mt-2">
-                    <input
-                      type="number"
-                      value={userPrediction}
-                      onChange={(e) => setUserPrediction(e.target.value)}
-                      className="border rounded p-1 mr-2"
-                      placeholder="Your prediction"
-                    />
-                    <button
-                      className="px-3 py-1 rounded bg-green-500 text-white"
-                      onClick={checkPrediction}
-                    >
-                      Check
-                    </button>
-                  </div>
-
-                  {feedbackMessage && (
-                    <p className="mt-2 font-bold text-center">{feedbackMessage}</p>
-                  )}
-
-                  <div className="mt-2 flex gap-2">
-                    <button
-                      className="px-3 py-1 rounded bg-gray-300"
-                      onClick={() => {
-                        setShowAnswer(true);
-                        setFeedbackMessage("The answer is shown on the graph!");
-                      }}
-                    >
-                      Show Answer
-                    </button>
-                    <button
-                      className="px-3 py-1 rounded bg-red-500 text-white"
-                      onClick={() => {
-                        setIsPredicting(false);
-                        setShowAnswer(false);
-                        setFeedbackMessage('');
-                      }}
-                    >
-                      Exit Challenge
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Instructions */}
-              <div className="mt-4 p-4 bg-gray-100 rounded w-full max-w-lg">
-                <h3 className="text-lg font-bold mb-2">How to use:</h3>
-                <ol className="list-decimal pl-5">
-                  <li>Click "Add Points" and then click on the graph to add data points</li>
-                  <li>Choose different interpolation methods to see how they work</li>
-                  <li>Read the terminology explanations for each method</li>
-                  <li>Hover over the line to see values at any point</li>
-                  <li>Use "Practice!" to test your understanding</li>
-                </ol>
-              </div>
-
-              <div className="mt-4 text-sm text-center text-gray-500">
-                <p>Created by the Coastal Hydrology Lab</p>
-                <p>Contributors: Faezeh Maghsoodifar, Michael Lewis, and Dr. Hamed Moftakhari</p>
-              </div>
-            </div>
-          );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<InterpolationExplorer />);
-    </script>
-
-    <!-- Babel for JSX transformation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.20/babel.min.js"></script>
-</body>
-</html>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0
