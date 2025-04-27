@@ -1,32 +1,31 @@
-# MathQuest-Interpolate: Interactive Math Exploration
+# Interpolation-Terminology-Alert: Interactive Math Visualization
 
-## Module 3: Discovering Interpolation Methods
+## Interactive Educational Tool for Understanding Interpolation Terminology
 
-This interactive educational tool helps K-12 students understand interpolation concepts through hands-on exploration and gamified learning. Students can visualize how different interpolation methods work by adding their own data points and seeing the results instantly.
+This interactive educational tool helps K-12 students grasp key terminology and concepts related to interpolation methods through visual, hands-on exploration. Students can see mathematical terms come to life as they manipulate data points and observe different interpolation techniques in action.
 
 ### Educational Benefits:
-- Builds intuition for mathematical modeling concepts
-- Encourages prediction and hypothesis testing
-- Visualizes abstract mathematical concepts
-- Offers appropriate explanations for different grade levels
-- Supports self-directed learning through experimentation
+- Bridges the gap between abstract mathematical terms and visual understanding
+- Reinforces vocabulary comprehension through interactive demonstration
+- Provides clear definitions with matching visual representations
+- Offers intuitive explanations of complex interpolation terminology
+- Supports both visual and textual learning approaches
 
 ### Features:
-- Interactive graph for adding and manipulating data points
-- Three interpolation methods to compare and contrast
-- Real-time visualization of interpolation results
-- Prediction challenges to test understanding
-- Clear explanations of mathematical concepts
-- Responsive design for use on various devices
-- Embeddable in ArcGIS StoryMaps for rich educational narratives
+- Interactive graph demonstrating key interpolation terminology
+- Three interpolation methods with comprehensive terminology explanations
+- Real-time visualization showing mathematical terms in action
+- Prediction challenges to reinforce understanding of concepts
+- Responsive design for use across educational devices
+- Embeddable in ArcGIS StoryMaps for curriculum integration
 
 ### Integration with Curriculum:
-This tool supports STEM learning objectives related to:
-- Data analysis and prediction
-- Mathematical modeling
-- Pattern recognition
-- Coordinate geometry
-- Applied mathematics
+This tool supports mathematics vocabulary development related to:
+- Data interpolation techniques and terminology
+- Mathematical modeling language
+- Technical vocabulary for prediction methods
+- Terms related to coordinate geometry
+- Language of applied mathematics
 
 ### Technical Requirements:
 - Modern web browser with JavaScript enabled
@@ -35,8 +34,8 @@ This tool supports STEM learning objectives related to:
 ### How to Use:
 1. Visit the hosted version at [your-github-pages-url]
 2. Click "Add Points" to place data points on the graph
-3. Try different interpolation methods and observe the results
-4. Use "Practice" mode to test understanding through prediction challenges
+3. See definitions update as you try different interpolation methods
+4. Use "Practice" mode to test terminology comprehension
 
 ### Contributors:
 - **Faezeh Maghsoodifar** (Graduate Research Assistant)
